@@ -6,15 +6,15 @@ use warnings;
 &main;
 
 sub main{
-	&read_file;
-	&user_input;
+	my $dk_rank=&read_file;
+	&user_input($dk_rank);
 }
 
-	my %dk_rank;
+#my %dk_rank;
 
 sub read_file{
 	open(DK_RANK,"rank.txt") or die "can't open file";
-	#my %dk_rank;
+	my %dk_rank;
 	
 	while(defined(my $line=<DK_RANK>)){	
 		chomp($line);
@@ -36,14 +36,14 @@ sub read_file{
 			}
 		}
 	}
-#	return \%dk_rank;
+	return \%dk_rank;
 }
 
 sub user_input{
-#	my($dk_rank)=@_;
+	my($dk_rank)=@_;
 	
-	foreach my $unique_rank(keys %dk_rank){
-		print "$unique_rank\n";
+	foreach my $unique_rank(keys %$dk_rank){
+		print "$unique_rank: $$dk_rank{$unique_rank}\n";
 	}
 }
 
