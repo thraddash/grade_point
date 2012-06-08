@@ -9,10 +9,14 @@ use CGI qw/:standard/;
 print "Content-type: text/html\n\n";
 print "<html><head><style type=\"text/css\">
 body{
+	background-image: url(\"2.png\")\;
+	background-repeat: no-repeat\;
     color: black\;
     background-color: white\;
+	font-size: 0.875em\;
 }    
 table th,table, table.center{
+	font-size: 1em\;
 	margin-left: auto\;
 	margin-right: auto\;	
 	background-color: 664d2f\;
@@ -22,56 +26,87 @@ table th,table, table.center{
 }
 </style></head><body>";
 
-
 print "<h2 align=\"center\">DK Square Gradepoint</h2>";
-print "<table border class=\"table\">";
 
-while(my $string=<DATA>){
-	chomp($string);
-	foreach(split(/\n/,$string)){
-		my($required_lvl,$rank,$point,$shield,$attack,$defense,$hp)=split(/,/,$string);
-		print "<tr><th>&nbsp$required_lvl&nbsp</th><th>&nbsp$rank&nbsp</th><th>&nbsp$point&nbsp</th><th>&nbsp$shield&nbsp</th><th>&nbsp$attack&nbsp</th><th>&nbsp$defense&nbsp</th><th>&nbsp$hp&nbsp</th></tr>";
-	}
-}
-	print "</table>";
-	print "<br>";
+print "<form method='post' action='/cgi-bin/grade_point/grade_point.pl' >
+<table border=\"0\">
+    <tr>
+        <td>
+            <select name=\"rank\">
+                <option value=\"selected\">Select current rank</option>
+                <option value=\"New Trainee\">New Trainee</option>
+                <option value=\"Trainee\">Trainee</option>
+                <option value=\"Senior Trainee\">Senior Trainee</option>
+                <option value=\"Elite Trainee\">Elite Trainee</option>
+                <option value=\"New Infantry\">New Infantry</option>
+                <option value=\"Infantry\">Infantry</option>
+                <option value=\"Senior Infantry\">Senior Infantry</option>
+                <option value=\"Elite Infantry\">Elite Infantry</option>
+                <option value=\"New Guard\">New Guard</option>
+                <option value=\"Guard\">Guard</option>
+                <option value=\"Senior Guar\">Senior Guard</option>
+                <option value=\"Elite Guard\">Elite Guard</option>
+                <option value=\"New Esquire\">New Esquire</option>
+                <option value=\"Senior Esquire\">Senior Esquire</option>
+                <option value=\"Elite Esquire\">Elite Esquire</option>
+                <option value=\"New Knight\">New Knight</option>
+                <option value=\"Knight\">Knight</option>
+                <option value=\"Senior Knight\">Senior Knight</option>
+                <option value=\"Elite Knight\">Elite Knight</option>
+                <option value=\"New White Knight\">New White Knight</option>
+                <option value=\"White Knight\">White Knight</option>
+                <option value=\"Senior White Knight\">Senior White Knight</option>
+                <option value=\"Elite White Knight\">Elite White Knight</option>
+                <option value=\"New Blue Knight\">New Blue Knight</option>
+                <option value=\"Blue Knight\">Blue Knight</option>
+                <option value=\"Senior Blue Knight\">Senior Blue Knight</option>
+                <option value=\"Elite Blue Knight\">Elite Blue Knight</option>
+            </select>
+        </td>
+        <td>
+            <input type=\"text\" name=\"user_input\" size=\"9\">
+        </td>
+        <td>
+            <input type=\"submit\" value=\"Calculate\">
+        </td>
+    </tr>
+</table>
+</form>";
 
 if(param()){
 	my $rank = param('rank');
 	my $user_input=param('user_input');
-			
-	print "Rank: $rank &nbsp &nbsp &nbsp GradePoint: $user_input\n";
-
-}
-
-
-#sub read_file{
-#	open(DK_RANK,"rank.txt") or die "can't open file";
-#	my @rank;
-#	my %dk_rank;
-#	while(defined(my $line=<DK_RANK>)){	
-#		chomp($line);
-#		if($line=~/Required Level,Rank,Point,Shield,Attack,Defense,HP/){
-#			next;
-#		}else{
-#			my($required_level,$rank,$point,$shield,$attack,$defense,$hp)=split(/,/,$line);	
-#			my $non_s=($point/5000);
-#			my $s=($point/8000);
-#			
-#			if($point % 5000){
-#				$non_s= 1+ int $non_s;
-#				if($point % 8000){
-#					$s= 1+ int $s;
-#					push(@rank,"$rank");
-#					$dk_rank{$rank}="$required_level,$rank,$point,$shield,$attack,$defense,$hp,$non_s,$s";
-#				}
-#			}
-#		}
-#	}
-#	foreach my $order_rank(@rank){
-#		print "$dk_rank{$order_rank}\n";
-#	}
+	if($user_input !~m/^\d+$/){
+		print "<center> $user_input is invalid</center><p>\n";
+	}else{
+		print "<center>Rank: $rank &nbsp &nbsp &nbsp Gradepoint: $user_input</center><p>\n";
+	}
 #}
+
+print "<table border class=\"table\">";
+print "<tr><th>&nbspRequired Level &nbsp</th><th>&nbspRank</th><th>&nbspPoint&nbsp</th><th>&nbspShield&nbsp</th><th>&nbspAttack&nbsp</th><th>&nbspDefense&nbsp</th><th>&nbspHP&nbsp</th><th>&nbspnon-s&nbsp</th><th>&nbsps-run&nbsp</th></tr>";
+while(my $string=<DATA>){
+	chomp($string);
+	foreach(split(/\n/,$string)){
+		if($string=~/Required Level,Rank,Point,Shield,Attack,Defense,HP/){
+			next;
+		}else{
+			my($required_lvl,$rank,$point,$shield,$attack,$defense,$hp)=split(/,/,$string);
+			my $non_s=($point/5000);
+			my $s=($point/8000);
+			if($point % 5000){
+				$non_s= 1+ int $non_s;
+				if($point % 8000){
+					$s= 1+ int $s;
+					print "<tr><th>&nbsp$required_lvl&nbsp</th><th>&nbsp$rank&nbsp</th><th>&nbsp$point&nbsp</th><th>&nbsp$shield&nbsp</th><th>&nbsp$attack&nbsp</th><th>&nbsp$defense&nbsp</th><th>&nbsp$hp&nbsp</th><th>&nbsp$non_s&nbsp</th><th>&nbsp$s&nbsp</th></tr>";
+				}
+			}
+		}
+	}
+}
+}
+print "</table>";
+print "<br>";
 print "</body></html>";
 
 __DATA__
