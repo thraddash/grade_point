@@ -5,11 +5,11 @@ use warnings;
 use CGI qw/:standard/; 
 
 #/var/log/apache2/error.log
+	#background-image: url(\"2.png\")\;
 
 print "Content-type: text/html\n\n";
 print "<html><head><style type=\"text/css\">
 body{
-	background-image: url(\"2.png\")\;
 	background-repeat: no-repeat\;
     color: black\;
     background-color: white\;
@@ -64,7 +64,7 @@ print "<form method='post' action='/cgi-bin/grade_point/grade_point.pl' >
             </select>
         </td>
         <td>
-            <input type=\"text\" name=\"user_input\" size=\"9\">
+            <input type=\"text\" name=\"user_input\" size=\"9\" maxlength=\"7\">
         </td>
         <td>
             <input type=\"submit\" value=\"Calculate\">
@@ -73,42 +73,66 @@ print "<form method='post' action='/cgi-bin/grade_point/grade_point.pl' >
 </table>
 </form>";
 
+my @jtdb;
+
 if(param()){
 	my $rank = param('rank');
 	my $user_input=param('user_input');
-	if($user_input !~m/^\d+$/){
-		print "<center> $user_input is invalid</center><p>\n";
-	}else{
-		print "<center>Rank: $rank &nbsp &nbsp &nbsp Gradepoint: $user_input</center><p>\n";
+	if(($rank =~/selected/)|($user_input !~m/\d+$/)||($user_input =~/^$/)){		
+		print "<center> Current Lvl & Input is invalid</center><p>\n";
 	}
-#}
-
-print "<table border class=\"table\">";
-print "<tr><th>&nbspRequired Level &nbsp</th><th>&nbspRank</th><th>&nbspPoint&nbsp</th><th>&nbspShield&nbsp</th><th>&nbspAttack&nbsp</th><th>&nbspDefense&nbsp</th><th>&nbspHP&nbsp</th><th>&nbspnon-s&nbsp</th><th>&nbsps-run&nbsp</th></tr>";
-while(my $string=<DATA>){
-	chomp($string);
-	foreach(split(/\n/,$string)){
-		if($string=~/Required Level,Rank,Point,Shield,Attack,Defense,HP/){
-			next;
-		}else{
-			my($required_lvl,$rank,$point,$shield,$attack,$defense,$hp)=split(/,/,$string);
-			my $non_s=($point/5000);
-			my $s=($point/8000);
-			if($point % 5000){
-				$non_s= 1+ int $non_s;
-				if($point % 8000){
-					$s= 1+ int $s;
-					print "<tr><th>&nbsp$required_lvl&nbsp</th><th>&nbsp$rank&nbsp</th><th>&nbsp$point&nbsp</th><th>&nbsp$shield&nbsp</th><th>&nbsp$attack&nbsp</th><th>&nbsp$defense&nbsp</th><th>&nbsp$hp&nbsp</th><th>&nbsp$non_s&nbsp</th><th>&nbsp$s&nbsp</th></tr>";
+	else{
+		while(my $string=<DATA>){
+			chomp($string);
+			foreach(split(/\n/,$string)){
+				if($string=~/Required Level,Rank,Point,Shield,Attack,Defense,HP/){
+					next;
+				}else{
+					my($required_lvl,$rank,$point,$shield,$attack,$defense,$hp)=split(/,/,$string);
+					my $non_s=($point/5000);
+					my $s=($point/8000);
+					if($point % 5000){
+						$non_s= 1+ int $non_s;
+					}
+					if($point % 8000){
+						$s= 1+ int $s;
+						push(@jtdb,"$required_lvl,$rank,$point,$shield,$attack,$defense,$hp,$non_s,$s");
+						#print "$required_lvl,$rank,$point,$shield,$attack,$defense,$hp,$non_s,$s<br>";
+					}
 				}
+			} 
+		}
+		foreach my $line(@jtdb){
+			my($required_lvl,$db_rank,$point,$shield,$attack,$defense,$hp,$non_s,$s)=split(/,/,$line);
+			if($rank eq "$db_rank"){
+				my $user_non_s=($point-$user_input);
+				my $user_s=($point-$user_input);
+				$user_non_s=($user_non_s/5000);
+				$user_s=($user_s/8000);
+				if($user_non_s % 5000){
+					$user_non_s=1+ int $user_non_s;
+				}
+				if($user_s % 8000){
+					$user_s=1+ int $user_s;
+				}
+				print "<center> Rank: $db_rank &nbsp Input: $user_input &nbsp  Non-s: $user_non_s &nbsp  S-Run: $user_s</center><p>";
+			}else{
+				next;
 			}
 		}
 	}
-}
-}
-print "</table>";
-print "<br>";
-print "</body></html>";
+	print "<table border class=\"table\">";
+	print "<tr><th>&nbspRequired Level &nbsp</th><th>&nbspRank</th><th>&nbspPoint&nbsp</th><th>&nbspShield&nbsp</th><th>&nbspAttack&nbsp</th><th>&nbspDefense&nbsp</th><th>&nbspHP&nbsp</th><th>&nbspnon-s&nbsp</th><th>&nbsps-run&nbsp</th></tr>";
+	foreach my $line(@jtdb){
+		chomp($line);
+		my($required_lvl,$db_rank,$point,$shield,$attack,$defense,$hp,$non_s,$s)=split(/,/,$line);	
+		print "<tr><th>&nbsp$required_lvl&nbsp</th><th>&nbsp$db_rank&nbsp</th><th>&nbsp$point&nbsp</th><th>&nbsp$shield&nbsp</th><th>&nbsp$attack&nbsp</th><th>&nbsp$defense&nbsp</th><th>&nbsp$hp&nbsp</th><th>&nbsp$non_s&nbsp</th><th>&nbsp$s&nbsp</th></tr>";
+	}	
+	print "</table>";
+	print "<br>";
+	print "</body></html>";
 
+}
 __DATA__
 Required Level,Rank,Point,Shield,Attack,Defense,HP
 50,New Trainee,3998,1501,0,0,0
