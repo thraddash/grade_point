@@ -4,18 +4,28 @@ use strict;
 use warnings;
 use CGI qw/:standard/; 
 
-my $q=CGI->new;
-print $q->header('text/html'),
-	  $q->start_html ('DK Square Grade Point'),
-	  $q->end_html;
+#/var/log/apache2/error.log
 
-	#thead td{
-	#	color: e3cdb6;
-	#}
+print "Content-type: text/html\n\n";
+print "<html><head><style type=\"text/css\">
+body{
+    color: black\;
+    background-color: white\;
+}    
+table th,table, table.center{
+	margin-left: auto\;
+	margin-right: auto\;	
+	background-color: 664d2f\;
+	border-color: f6e1c6\;
+	border-style: solid\;
+	color: f6e1c6\;
+}
+</style></head><body>";
 
 
 print "<h2 align=\"center\">DK Square Gradepoint</h2>";
-print "<table border=\"1\" align=\"center\" bordercolor=\"f8e2ca\" bgcolor=\"664c31\">";
+print "<table border class=\"table\">";
+
 while(my $string=<DATA>){
 	chomp($string);
 	foreach(split(/\n/,$string)){
@@ -23,7 +33,7 @@ while(my $string=<DATA>){
 		print "<tr><th>&nbsp$required_lvl&nbsp</th><th>&nbsp$rank&nbsp</th><th>&nbsp$point&nbsp</th><th>&nbsp$shield&nbsp</th><th>&nbsp$attack&nbsp</th><th>&nbsp$defense&nbsp</th><th>&nbsp$hp&nbsp</th></tr>";
 	}
 }
-	print "</font></table>";
+	print "</table>";
 	print "<br>";
 
 if(param()){
@@ -62,6 +72,8 @@ if(param()){
 #		print "$dk_rank{$order_rank}\n";
 #	}
 #}
+print "</body></html>";
+
 __DATA__
 Required Level,Rank,Point,Shield,Attack,Defense,HP
 50,New Trainee,3998,1501,0,0,0
