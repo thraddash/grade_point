@@ -28,7 +28,7 @@ table th,table, table.center{
 
 print "<h2 align=\"center\">DK Square Gradepoint</h2>";
 
-print "<form method='post' action='/cgi-bin/grade_point/grade_point.pl' >
+print "<form method='post' action='/cgi-bin/grade_point.pl' >
 <table border=\"0\">
     <tr>
         <td>
