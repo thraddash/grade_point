@@ -28,7 +28,7 @@ table th,table, table.center{
 
 print "<h2 align=\"center\">DK Square Gradepoint</h2>";
 
-print "<form method='post' action='/cgi-bin/grade_point.pl' >
+print "<form method='post' action='/cgi-bin/g.pl' >
 <table border=\"0\">
     <tr>
         <td>
@@ -78,6 +78,7 @@ my @jtdb;
 if(param()){
 	my $rank = param('rank');
 	my $user_input=param('user_input');
+	my($user_s,$user_non_s);
 	if(($rank =~/selected/)|($user_input !~m/\d+$/)||($user_input =~/^$/)){		
 		print "<center> Current Lvl & Input is invalid</center><p>\n";
 	}
@@ -105,8 +106,8 @@ if(param()){
 		foreach my $line(@jtdb){
 			my($required_lvl,$db_rank,$point,$shield,$attack,$defense,$hp,$non_s,$s)=split(/,/,$line);
 			if($rank eq "$db_rank"){
-				my $user_non_s=($point-$user_input);
-				my $user_s=($point-$user_input);
+				$user_non_s=($point-$user_input);
+				$user_s=($point-$user_input);
 				$user_non_s=($user_non_s/5000);
 				$user_s=($user_s/8000);
 				if($user_non_s % 5000){
@@ -126,7 +127,11 @@ if(param()){
 	foreach my $line(@jtdb){
 		chomp($line);
 		my($required_lvl,$db_rank,$point,$shield,$attack,$defense,$hp,$non_s,$s)=split(/,/,$line);	
-		print "<tr><th>&nbsp$required_lvl&nbsp</th><th>&nbsp$db_rank&nbsp</th><th>&nbsp$point&nbsp</th><th>&nbsp$shield&nbsp</th><th>&nbsp$attack&nbsp</th><th>&nbsp$defense&nbsp</th><th>&nbsp$hp&nbsp</th><th>&nbsp$non_s&nbsp</th><th>&nbsp$s&nbsp</th></tr>";
+		if($rank eq $db_rank){
+			print "<tr bgcolor='000000'><td>&nbsp$required_lvl&nbsp</td><td>&nbsp$db_rank&nbsp</td><td>&nbsp$point&nbsp</td><td>&nbsp$shield&nbsp</td><td>&nbsp$attack&nbsp</td><td>&nbsp$defense&nbsp</td><td>&nbsp$hp&nbsp</td><td>&nbsp$user_non_s&nbsp</td><td>&nbsp$user_s&nbsp</td></tr>";
+		}else{
+			print "<tr><td>&nbsp$required_lvl&nbsp</td><td>&nbsp$db_rank&nbsp</td><td>&nbsp$point&nbsp</td><td>&nbsp$shield&nbsp</td><td>&nbsp$attack&nbsp</td><td>&nbsp$defense&nbsp</td><td>&nbsp$hp&nbsp</td><td>&nbsp$non_s&nbsp</td><td>&nbsp$s&nbsp</td></tr>";
+		}
 	}	
 	print "</table>";
 	print "<br>";
