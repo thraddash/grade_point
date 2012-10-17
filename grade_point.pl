@@ -76,6 +76,8 @@ print "<form method='post' action='/cgi-bin/grade_point.pl' >
 my @jtdb;
 
 if(param()){
+	my $remain;
+	my $dksq;
 	my $rank = param('rank');
 	my $user_input=param('user_input');
 	my($user_s,$user_non_s);
@@ -116,7 +118,17 @@ if(param()){
 				if($user_s % 8000){
 					$user_s=1+ int $user_s;
 				}
-				print "<center> Rank: $db_rank &nbsp Input: $user_input &nbsp  Non-s: $user_non_s &nbsp  S-Run: $user_s</center><p>";
+				$remain=($point-$user_input);
+				$dksq=($remain/10000);
+				$dksq=sprintf("%.2f",$dksq);
+				$remain=reverse($remain);
+				$remain=~s/(\d{3})(?=\d)(?!\d*\.)/$1,/g;
+				$remain=reverse($remain);
+				
+				$user_input=reverse($user_input);
+				$user_input=~s/(\d{3})(?=\d)(?!\d*\.)/$1,/g;
+				$user_input=reverse($user_input);
+				print "<center> Rank: $db_rank &nbsp Input: $user_input &nbsp Remain: $remain &nbsp  Non-s: $user_non_s &nbsp  S-Run: $user_s &nbsp ~Dk_Sq-Run: $dksq</center><p>";
 			}else{
 				next;
 			}
