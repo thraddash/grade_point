@@ -1,5 +1,6 @@
 * { -moz-box-sizing:border-box; -webkit-box-sizing:border-box; box-sizing:border-box; *behavior:url(boxsizing.htc); }
-html, body {
+html, body, {
+	color:#fff;
         margin:0;
         padding:0;background:#fff;
         line-height:1;
