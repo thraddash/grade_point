@@ -1,36 +1,27 @@
-#!/usr/bin/perl 
+#!/usr/bin/perl
 
 use strict;
 use warnings;
-use CGI qw/:standard/; 
+use CGI qw/:standard/;
 
 #/var/log/apache2/error.log
-	#background-image: url(\"2.png\")\;
+        #background-image: url(\"2.png\")\;
 
 print "Content-type: text/html\n\n";
-print "<html><head><style type=\"text/css\">
-body{
-	background-repeat: no-repeat\;
-    color: black\;
-    background-color: white\;
-	font-size: 0.875em\;
-}    
-table th,table, table.center{
-	font-size: 1em\;
-	margin-left: auto\;
-	margin-right: auto\;	
-	background-color: 664d2f\;
-	border-color: f6e1c6\;
-	border-style: solid\;
-	color: f6e1c6\;
-}
-</style></head><body>";
+print "<html><head>
 
-print "<h2 align=\"center\">DK Square Gradepoint</h2>";
-
-print "<form method='post' action='/cgi-bin/grade_point.pl' >
-<table border=\"0\">
-    <tr>
+ <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:900&text=ABCDEFGHIJKLMNOPQRSTUVWXYZ' rel='stylesheet' type='text/css'>
+    <link rel='stylesheet' href='css/style.css'>
+    <link rel='stylesheet' href='css/bigvideo.css'>
+                <link rel='stylesheet' href='http://spathiwa.com/css/style.css'>
+</head>
+<body>
+                <div class='main'>
+        <div id='overview' class='box'>
+                <h3><center>DK Square GradePoint</h3>
+                                        <p>";
+                                        print "<form method='post' action='/cgi-bin/grade_point/grade_point.pl' >
+<table border=\"0\" align=\"center\">
         <td>
             <select name=\"rank\">
                 <option value=\"selected\">Select current rank</option>
@@ -69,85 +60,105 @@ print "<form method='post' action='/cgi-bin/grade_point.pl' >
         <td>
             <input type=\"submit\" value=\"Calculate\">
         </td>
-    </tr>
-</table>
-</form>";
+</table><form></p>";
+
+        #       <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>
+        #       <script>window.jQuery || document.write <script src='http://spathiwa.com/js/jquery-1.7.2.min.js'></script></script>
+  #  <script src='http://spathiwa.com/js/jquery-ui-1.8.22.custom.min.js'></script>
+  #  <script src='http://spathiwa.com/js/jquery.imagesloaded.min.js'></script>
+  #  <script src='http://vjs.zencdn.net/c/video.js'></script>
+
+  #  <script src='http://spathiwa.com/js/bigvideo.js'></script>
+  #  <script>
+  #      var BV;
+  #          \$(function() {
+#
+#            // initialize BigVideo
+#            BV = new \$.BigVideo();
+#                        BV.init();
+#                        BV.show('http://spathiwa.com/bird4.mp4',{ambient:true});
+#            });
+#    </script></div></div>";
 
 my @jtdb;
-
 if(param()){
-	my $remain;
-	my $dksq;
-	my $rank = param('rank');
-	my $user_input=param('user_input');
-	my($user_s,$user_non_s);
-	if(($rank =~/selected/)|($user_input !~m/\d+$/)||($user_input =~/^$/)){		
-		print "<center> Current Lvl & Input is invalid</center><p>\n";
-	}
-	else{
-		while(my $string=<DATA>){
-			chomp($string);
-			foreach(split(/\n/,$string)){
-				if($string=~/Required Level,Rank,Point,Shield,Attack,Defense,HP/){
-					next;
-				}else{
-					my($required_lvl,$rank,$point,$shield,$attack,$defense,$hp)=split(/,/,$string);
-					my $non_s=($point/5000);
-					my $s=($point/8000);
-					if($point % 5000){
-						$non_s= 1+ int $non_s;
-					}
-					if($point % 8000){
-						$s= 1+ int $s;
-						push(@jtdb,"$required_lvl,$rank,$point,$shield,$attack,$defense,$hp,$non_s,$s");
-						#print "$required_lvl,$rank,$point,$shield,$attack,$defense,$hp,$non_s,$s<br>";
-					}
-				}
-			} 
-		}
-		foreach my $line(@jtdb){
-			my($required_lvl,$db_rank,$point,$shield,$attack,$defense,$hp,$non_s,$s)=split(/,/,$line);
-			if($rank eq "$db_rank"){
-				$user_non_s=($point-$user_input);
-				$user_s=($point-$user_input);
-				$user_non_s=($user_non_s/5000);
-				$user_s=($user_s/8000);
-				if($user_non_s % 5000){
-					$user_non_s=1+ int $user_non_s;
-				}
-				if($user_s % 8000){
-					$user_s=1+ int $user_s;
-				}
-				$remain=($point-$user_input);
-				$dksq=($remain/10000);
-				$dksq=sprintf("%.2f",$dksq);
-				$remain=reverse($remain);
-				$remain=~s/(\d{3})(?=\d)(?!\d*\.)/$1,/g;
-				$remain=reverse($remain);
-				
-				$user_input=reverse($user_input);
-				$user_input=~s/(\d{3})(?=\d)(?!\d*\.)/$1,/g;
-				$user_input=reverse($user_input);
-				print "<center> Rank: $db_rank &nbsp Input: $user_input &nbsp Remain: $remain &nbsp  Non-s: $user_non_s &nbsp  S-Run: $user_s &nbsp ~Dk_Sq-Run: $dksq</center><p>";
-			}else{
-				next;
-			}
-		}
-	}
-	print "<table border class=\"table\">";
-	print "<tr><th>&nbspRequired Level &nbsp</th><th>&nbspRank</th><th>&nbspPoint&nbsp</th><th>&nbspShield&nbsp</th><th>&nbspAttack&nbsp</th><th>&nbspDefense&nbsp</th><th>&nbspHP&nbsp</th><th>&nbspnon-s&nbsp</th><th>&nbsps-run&nbsp</th></tr>";
-	foreach my $line(@jtdb){
-		chomp($line);
-		my($required_lvl,$db_rank,$point,$shield,$attack,$defense,$hp,$non_s,$s)=split(/,/,$line);	
-		if($rank eq $db_rank){
-			print "<tr bgcolor='000000'><td>&nbsp$required_lvl&nbsp</td><td>&nbsp$db_rank&nbsp</td><td>&nbsp$point&nbsp</td><td>&nbsp$shield&nbsp</td><td>&nbsp$attack&nbsp</td><td>&nbsp$defense&nbsp</td><td>&nbsp$hp&nbsp</td><td>&nbsp$user_non_s&nbsp</td><td>&nbsp$user_s&nbsp</td></tr>";
-		}else{
-			print "<tr><td>&nbsp$required_lvl&nbsp</td><td>&nbsp$db_rank&nbsp</td><td>&nbsp$point&nbsp</td><td>&nbsp$shield&nbsp</td><td>&nbsp$attack&nbsp</td><td>&nbsp$defense&nbsp</td><td>&nbsp$hp&nbsp</td><td>&nbsp$non_s&nbsp</td><td>&nbsp$s&nbsp</td></tr>";
-		}
-	}	
-	print "</table>";
-	print "<br>";
-	print "</body></html>";
+        my $remain;
+        my $dksq;
+        my $rank = param('rank');
+        my $user_input=param('user_input');
+        my($user_s,$user_non_s);
+        if(($rank =~/selected/)|($user_input !~m/\d+$/)||($user_input =~/^$/)){
+                print "<center> Current Lvl & Input is invalid</center><p><p>\n";
+        }
+        else{
+                while(my $string=<DATA>){
+                        chomp($string);
+                        foreach(split(/\n/,$string)){
+                                if($string=~/Required Level,Rank,Point,Shield,Attack,Defense,HP/){
+                                        next;
+                                }else{
+                                        my($required_lvl,$rank,$point,$shield,$attack,$defense,$hp)=split(/,/,$string);
+                                        my $non_s=($point/5000);
+                                        my $s=($point/8000);
+                                        if($point % 5000){
+                                                $non_s= 1+ int $non_s;
+                                        }
+                                        if($point % 8000){
+                                                $s= 1+ int $s;
+                                                push(@jtdb,"$required_lvl,$rank,$point,$shield,$attack,$defense,$hp,$non_s,$s");
+                                                #print "$required_lvl,$rank,$point,$shield,$attack,$defense,$hp,$non_s,$s<br>";
+                                        }
+                                }
+                        }
+                }
+                foreach my $line(@jtdb){
+                        my($required_lvl,$db_rank,$point,$shield,$attack,$defense,$hp,$non_s,$s)=split(/,/,$line);
+                        if($rank eq "$db_rank"){
+                                $user_non_s=($point-$user_input);
+                                $user_s=($point-$user_input);
+                                $user_non_s=($user_non_s/5000);
+                                $user_s=($user_s/8000);
+                                if($user_non_s % 5000){
+                                        $user_non_s=1+ int $user_non_s;
+                                }
+                                if($user_s % 8000){
+                                        $user_s=1+ int $user_s;
+                                }
+                                $remain=($point-$user_input);
+                                $dksq=($remain/10000);
+                                $dksq=sprintf("%.2f",$dksq);
+                                $remain=reverse($remain);
+                                $remain=~s/(\d{3})(?=\d)(?!\d*\.)/$1,/g;
+                                $remain=reverse($remain);
+
+                                $user_input=reverse($user_input);
+                                $user_input=~s/(\d{3})(?=\d)(?!\d*\.)/$1,/g;
+                                $user_input=reverse($user_input);
+                                print "<center> Rank: $db_rank &nbsp Input: $user_input &nbsp Remain: $remain &nbsp  Non-s: $user_non_s &nbsp
+ S-Run: $user_s &nbsp ~Dk_Sq-Run: $dksq</center><p><p>";
+                        }else{
+                                next;
+                        }
+                }
+        }
+        print "<table border class=\"table\" align=\"center\">";
+        print "<tr><th>&nbspRequired Level &nbsp</th><th>&nbspRank</th><th>&nbspPoint&nbsp</th><th>&nbspShield&nbsp</th><th>&nbspAttack&nbsp</
+th><th>&nbspDefense&nbsp</th><th>&nbspHP&nbsp</th><th>&nbspnon-s&nbsp</th><th>&nbsps-run&nbsp</th></tr>";
+        foreach my $line(@jtdb){
+                chomp($line);
+                my($required_lvl,$db_rank,$point,$shield,$attack,$defense,$hp,$non_s,$s)=split(/,/,$line);
+                if($rank eq $db_rank){
+                        print "<tr bgcolor='#444'><td>&nbsp$required_lvl&nbsp</td><td>&nbsp$db_rank&nbsp</td><td>&nbsp$point&nbsp</td><td>&nbs
+p$shield&nbsp</td><td>&nbsp$attack&nbsp</td><td>&nbsp$defense&nbsp</td><td>&nbsp$hp&nbsp</td><td>&nbsp$user_non_s&nbsp</td><td>&nbsp$user_s&nb
+sp</td></tr>";
+                }else{
+                        print "<tr><td>&nbsp$required_lvl&nbsp</td><td>&nbsp$db_rank&nbsp</td><td>&nbsp$point&nbsp</td><td>&nbsp$shield&nbsp</
+td><td>&nbsp$attack&nbsp</td><td>&nbsp$defense&nbsp</td><td>&nbsp$hp&nbsp</td><td>&nbsp$non_s&nbsp</td><td>&nbsp$s&nbsp</td></tr>";
+                }
+        }
+        print "</table>";
+        print "<br>";
+        print "</body></html>";
 
 }
 __DATA__
@@ -172,7 +183,7 @@ Required Level,Rank,Point,Shield,Attack,Defense,HP
 131,Knight,1476488,4895,66,51,620
 131,Senior Knight,1771785,4972,70,55,650
 131,Elite Knight,2126143,5049,74,59,680
-131,New White Knight,2551371,5125,99,74,780
+131,New White Knight,2551371,191,25,21,100
 131,White Knight,3061645,5202,105,80,810
 131,Senior White Knight,3673974,5278,111,86,840
 131,Elite White Knight,5073721,5355,117,92,870
@@ -180,3 +191,4 @@ Required Level,Rank,Point,Shield,Attack,Defense,HP
 131,Blue Knight,7306158,5509,148,118,1040
 131,Senior Blue Knight,8767389,5586,154,124,1090
 131,Elite Blue Knight,10520867,5661,160,130,1140
+
